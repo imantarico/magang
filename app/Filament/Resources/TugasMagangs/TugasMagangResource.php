@@ -36,7 +36,14 @@ class TugasMagangResource extends Resource
             //
         ];
     }
-
+    public static function getPluralLabel(): ?string
+    {
+        return 'Tugas Magang'; // untuk judul menu & halaman index
+    }
+    public static function getLabel(): ?string
+    {
+        return 'Tugas Magang'; // untuk judul tunggal (edit, detail)
+    }
     public static function getPages(): array
     {
         return [
