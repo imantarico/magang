@@ -121,6 +121,7 @@ class RegisterPeserta extends Page
         PesertaMagang::create([
             ...$validated,
             'user_id' => $user->id,
+            'nama' => $validated['nama'],
             'status' => 'daftar',
         ]);
 

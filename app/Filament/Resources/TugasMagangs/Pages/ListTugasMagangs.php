@@ -16,7 +16,7 @@ class ListTugasMagangs extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Tambah Peserta Magang') // ✅ ubah label tombol
+                ->label('Tambah Tugas Magang') // ✅ ubah label tombol
                 ->icon('heroicon-o-plus-circle'), // (opsional) ubah ikon
         ];
     }

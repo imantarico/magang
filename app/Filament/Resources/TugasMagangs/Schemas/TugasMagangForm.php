@@ -53,7 +53,6 @@ class TugasMagangForm
                 ->label('Tenggat Waktu')
                 ->required(),
 
-
             // 🔹 Status pengerjaan
             Select::make('status')
                 ->label('Status')
