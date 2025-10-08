@@ -2,117 +2,108 @@
 
 namespace App\Filament\Peserta\Pages;
 
-use App\Models\User;
 use App\Models\PesertaMagang;
-use Filament\Pages\Page;
+use App\Models\User;
 use Filament\Forms;
+use Filament\Pages\Page;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Hash;
-use BackedEnum;
-use UnitEnum;
 
 class RegisterPeserta extends Page
 {
     use Forms\Concerns\InteractsWithForms;
 
-    // 🔹 Konfigurasi dasar halaman
-     protected static ?string $model = PesertaMagang::class;
     protected static ?string $title = 'Pendaftaran Peserta Magang';
-    protected static ?string $navigationLabel = 'Peserta Magang';
-    protected static UnitEnum|string|null $navigationGroup = 'Data Magang';
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $slug = 'peserta-magang';
-    protected static ?string $recordTitleAttribute = 'nama';
+    protected static ?string $slug = 'register'; // URL: /peserta/register
+    // protected static string $view = 'filament.peserta.pages.register-peserta';
     protected static string $layout = 'filament-panels::components.layout.simple';
-    protected static bool $shouldRegisterNavigation = false;
-
+    protected static bool $shouldRegisterNavigation = false; // Tidak tampil di sidebar
     protected string $view = 'filament.peserta.pages.register-peserta';
-    public ?array $data = [];
 
+
+    public ?array $data = [];
+    public function hasLogo(): bool
+    {
+        return false;
+    }
     /**
-     * 🔹 Skema Formulir (Filament v4)
+     * 🔹 Skema Formulir (sesuai PesertaMagangForm)
      */
     protected function getFormSchema(): array
     {
         return [
             Forms\Components\TextInput::make('nama')
                 ->label('Nama Lengkap')
-                ->required(),
+                ->required()
+                ->maxLength(150),
 
             Forms\Components\TextInput::make('no_identitas')
-                ->label('No Identitas (NIM/NIK)')
-                ->unique('peserta_magang', 'no_identitas')
-                ->required(),
+                ->label('No. Identitas (KTP / NIM / NISN)')
+                ->maxLength(50),
 
             Forms\Components\Select::make('jenis_kelamin')
-                ->label('Jenis Kelamin')
                 ->options([
                     'L' => 'Laki-laki',
                     'P' => 'Perempuan',
                 ])
-                ->required(),
+                ->required()
+                ->label('Jenis Kelamin'),
 
             Forms\Components\DatePicker::make('tanggal_lahir')
                 ->label('Tanggal Lahir')
                 ->required(),
 
             Forms\Components\TextInput::make('no_hp')
-                ->label('Nomor HP / WhatsApp')
+                ->label('No. HP')
                 ->tel()
-                ->required(),
+                ->maxLength(20),
 
             Forms\Components\TextInput::make('email')
-                ->label('Email Aktif')
+                ->label('Email')
                 ->email()
                 ->unique('users', 'email')
-                ->required(),
+                ->required()
+                ->maxLength(150),
 
             Forms\Components\Textarea::make('alamat')
-                ->label('Alamat Lengkap')
-                ->rows(3)
-                ->required()
+                ->label('Alamat')
                 ->columnSpanFull(),
 
-            Forms\Components\TextInput::make('jurusan')
-                ->label('Jurusan / Program Studi')
-                ->required(),
-
-            Forms\Components\TextInput::make('semester')
-                ->label('Semester')
-                ->numeric()
-                ->minValue(1)
-                ->maxValue(14)
-                ->required(),
-
-            Forms\Components\TextInput::make('asal_instansi')
-                ->label('Asal Instansi / Kampus / Sekolah')
-                ->required(),
-
             Forms\Components\FileUpload::make('foto')
-                ->label('Pas Foto (max 2MB)')
-                ->directory('peserta/foto')
+                ->label('Pas Foto')
                 ->image()
-                ->maxSize(2048)
-                ->required(),
+                ->directory('peserta/foto'),
+
 
             Forms\Components\FileUpload::make('cv')
-                ->label('Curriculum Vitae (PDF, max 2MB)')
+                ->label('CV')
                 ->directory('peserta/cv')
                 ->acceptedFileTypes(['application/pdf'])
-                ->maxSize(2048)
-                ->required(),
+                ->maxSize(2048),
+
+            Forms\Components\TextInput::make('jurusan')
+                ->label('Jurusan')
+                ->maxLength(100),
+
+            Forms\Components\Select::make('semester')
+                ->label('Semester')
+                ->options(array_combine(range(1, 12), range(1, 12)))
+                ->default(1),
+
+            Forms\Components\TextInput::make('asal_instansi')
+                ->label('Asal Instansi')
+                ->maxLength(150),
 
             Forms\Components\FileUpload::make('surat_pengantar')
-                ->label('Surat Pengantar (PDF, max 2MB)')
-                ->directory('peserta/surat')
+                ->label('Surat Pengantar')
                 ->acceptedFileTypes(['application/pdf'])
-                ->maxSize(2048)
-                ->required(),
+                ->directory('peserta/surat_pengantar')
+                ->maxSize(2048),
         ];
     }
 
     /**
-     * 🔹 Proses submit formulir pendaftaran
+     * 🔹 Proses submit formulir
      */
     public function submit(): void
     {
@@ -122,7 +113,7 @@ class RegisterPeserta extends Page
         $user = User::create([
             'name' => $validated['nama'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['tanggal_lahir']), // password = tanggal lahir
+            'password' => Hash::make($validated['tanggal_lahir']), // default password = tanggal lahir
             'role' => 'peserta',
         ]);
 
@@ -133,15 +124,18 @@ class RegisterPeserta extends Page
             'status' => 'daftar',
         ]);
 
-        // ✅ Notifikasi sukses
         Notification::make()
             ->title('Pendaftaran Berhasil!')
             ->body('Akun Anda telah terdaftar. Silakan tunggu verifikasi dari admin.')
             ->success()
             ->send();
 
-        // Kosongkan form & redirect
         $this->form->fill([]);
         $this->redirect('/peserta/login');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
     }
 }

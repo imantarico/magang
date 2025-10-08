@@ -51,8 +51,8 @@ class TugasMagangForm
 
             DatePicker::make('tenggat_waktu')
                 ->label('Tenggat Waktu')
-                ->required()
-                ->rule('after_or_equal:today'),
+                ->required(),
+
 
             // 🔹 Status pengerjaan
             Select::make('status')

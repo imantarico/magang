@@ -15,7 +15,7 @@
 </head>
 <body>
     <h2>LAPORAN PESERTA MAGANG</h2>
-    <h3>PT Metaverse</h3>
+    <h3>PT Metaverse Digital Indonesia</h3>
     <hr>
 
     <div class="section">

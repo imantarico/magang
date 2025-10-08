@@ -23,6 +23,9 @@ class PesertaMagang extends Model
         'semester',
         'asal_instansi',
         'surat_pengantar',
+        'tanggal_mulai',
+        'tanggal_selesai',
+        'status',
     ];
 
     public function user()

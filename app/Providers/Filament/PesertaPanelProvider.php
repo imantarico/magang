@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
+use App\Filament\Peserta\Pages\RegisterPeserta;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -26,20 +26,23 @@ class PesertaPanelProvider extends PanelProvider
         return $panel
             ->id('peserta')
             ->path('peserta')
-            ->login() // ditambahkan
+            ->login()
+            ->homeUrl('/peserta')
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->discoverWidgets(in: app_path('Filament/Peserta/Widgets'), for: 'App\Filament\Peserta\Widgets')
             ->discoverResources(in: app_path('Filament/Peserta/Resources'), for: 'App\Filament\Peserta\Resources')
             ->discoverPages(in: app_path('Filament/Peserta/Pages'), for: 'App\Filament\Peserta\Pages')
             ->pages([
-                Dashboard::class,
+            \App\Filament\Peserta\Pages\Dashboard::class,
+            \App\Filament\Peserta\Pages\RegisterPeserta::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Peserta/Widgets'), for: 'App\Filament\Peserta\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
+            // AccountWidget::class,
+            // FilamentInfoWidget::class,
+        ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -52,10 +55,7 @@ class PesertaPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
-                // Middleware autentikasi khusus untuk panel peserta
-
-
+                \App\Http\Middleware\AuthPesertaPanel::class, // ✅ custom middleware
             ]);
     }
 }

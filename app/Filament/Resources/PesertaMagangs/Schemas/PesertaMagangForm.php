@@ -83,6 +83,14 @@ class PesertaMagangForm
                 ->label('Surat Pengantar')
                 ->acceptedFileTypes(['application/pdf'])
                 ->directory('peserta/surat_pengantar'),
+            //tanggal mulai dan selesai magang ada di tabel penempatan magang
+            DatePicker::make('tanggal_mulai')
+                ->label('Tanggal Mulai Magang')
+                ->required(),
+            DatePicker::make('tanggal_selesai')
+                ->label('Tanggal Selesai Magang')
+                ->required(),
+
         ]);
     }
 }

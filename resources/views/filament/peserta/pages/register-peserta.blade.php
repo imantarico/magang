@@ -1,18 +1,18 @@
-<x-filament-panels::page>
-    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow p-6">
-        <h2 class="text-2xl font-semibold text-center mb-6 text-primary-600">
-            Pendaftaran Peserta Magang
-        </h2>
+<x-filament-panels::page.simple>
+    <div class="max-w-2xl mx-auto space-y-6">
+        <x-filament::section>
+            <x-slot name="heading">
+                📝 Pendaftaran Peserta Magang
+            </x-slot>
 
-        <x-filament-forms::form wire:submit="submit">
+            {{-- Semua form otomatis di-render --}}
             {{ $this->form }}
 
-            <div class="mt-6 flex justify-center">
-                <x-filament::button type="submit" color="primary" size="lg">
-                    <x-heroicon-o-paper-airplane class="w-5 h-5 mr-2" />
+            <div class="mt-4">
+                <x-filament::button wire:click="submit" class="w-full">
                     Daftar Sekarang
                 </x-filament::button>
             </div>
-        </x-filament-forms::form>
+        </x-filament::section>
     </div>
-</x-filament-panels::page>
+</x-filament-panels::page.simple>

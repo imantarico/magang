@@ -3,13 +3,16 @@
 namespace App\Filament\Resources\PesertaMagangs\Tables;
 
 use Filament\Tables\Table;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextInputColumn;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
@@ -24,21 +27,56 @@ class PesertaMagangsTable
     {
         return $table
             ->columns([
-                TextColumn::make('nama')
+            // === IDENTITAS PESERTA ===
+            // ImageColumn::make('foto')
+            //     ->label('Foto')
+            //     ->disk('public')
+            //     ->circular()
+            //     ->width(50)
+            //     ->height(50),
+
+            TextColumn::make('nama')
                     ->label('Nama Lengkap')
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('asal_instansi')
-                    ->label('Instansi')
-                    ->sortable()
+            TextColumn::make('no_identitas')
+                ->label('No Identitas')
+                ->searchable()
+                ->sortable(),
+
+            TextColumn::make('jenis_kelamin')
+                ->label('Jenis Kelamin')
+                ->formatStateUsing(fn($state) => $state === 'L' ? 'Laki-laki' : 'Perempuan'),
+
+            TextColumn::make('tanggal_lahir')
+                ->label('Tanggal Lahir')
+                ->date('d M Y')
+                ->sortable(),
+
+            TextColumn::make('no_hp')
+                ->label('Nomor HP')
                     ->searchable(),
 
                 TextColumn::make('email')
                     ->label('Email')
                     ->searchable(),
 
-                SelectColumn::make('status')
+            TextColumn::make('asal_instansi')
+                ->label('Instansi Asal')
+                ->searchable()
+                ->sortable(),
+
+            TextColumn::make('jurusan')
+                ->label('Jurusan')
+                ->sortable(),
+
+            TextColumn::make('semester')
+                ->label('Semester')
+                ->sortable(),
+
+            // === STATUS & TANGGAL MAGANG ===
+            SelectColumn::make('status')
                     ->label('Status')
                     ->options([
                         'daftar' => 'Daftar',
@@ -65,76 +103,79 @@ class PesertaMagangsTable
                             ->body("Status peserta {$record->nama} diubah menjadi " . ucfirst($state))
                             ->success()
                             ->send();
-                    })
-                    ->sortable(),
+                }),
 
-                TextInputColumn::make('tanggal_mulai')
-                    ->label('Tanggal Mulai')
-                    ->type('date')
-                    ->disabled(fn ($record) => $record->status !== 'aktif')
-                    ->afterStateUpdated(function ($record, $state) {
-                        if ($record->tanggal_selesai && $state > $record->tanggal_selesai) {
-                            Notification::make()
-                                ->title('Gagal')
-                                ->body('Tanggal mulai tidak boleh setelah tanggal selesai.')
-                                ->danger()
-                                ->send();
-                            return;
-                        }
+            TextColumn::make('tanggal_mulai')
+                ->label('Mulai Magang')
+                ->date('d M Y')
+                ->sortable(),
+            TextColumn::make('tanggal_selesai')
+                ->label('Selesai Magang')
+                ->date('d M Y')
+                ->sortable(),
 
-                        $record->update(['tanggal_mulai' => $state]);
-
-                        Notification::make()
-                            ->title('Tanggal Mulai Diperbarui')
-                            ->body("Tanggal mulai {$record->nama} diubah menjadi " . Carbon::parse($state)->format('d M Y'))
-                            ->success()
-                            ->send();
-                    }),
-
-                TextInputColumn::make('tanggal_selesai')
-                    ->label('Tanggal Selesai')
-                    ->type('date')
-                    ->disabled(fn ($record) => $record->status !== 'aktif')
-                    ->afterStateUpdated(function ($record, $state) {
-                        if ($record->tanggal_mulai && $state < $record->tanggal_mulai) {
-                            Notification::make()
-                                ->title('Gagal')
-                                ->body('Tanggal selesai tidak boleh sebelum tanggal mulai.')
-                                ->danger()
-                                ->send();
-                            return;
-                        }
-
-                        $record->update(['tanggal_selesai' => $state]);
-
-                        Notification::make()
-                            ->title('Tanggal Selesai Diperbarui')
-                            ->body("Tanggal selesai {$record->nama} diubah menjadi " . Carbon::parse($state)->format('d M Y'))
-                            ->success()
-                            ->send();
-                    }),
-
-                TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
             ])
+
+            // === AKSI PER RECORD ===
             ->recordActions([
-                EditAction::make(),
+                // 🔹 Lihat Data
+                ViewAction::make()
+                    ->label('Lihat')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading('Detail Peserta Magang')
+                    ->form([
+                        \Filament\Forms\Components\ViewField::make('foto')
+                            ->label('Foto')
+                            ->view('filament.components.view-foto'),
+
+                \Filament\Forms\Components\TextInput::make('nama')->label('Nama Lengkap')->disabled(),
+                \Filament\Forms\Components\TextInput::make('no_identitas')->label('No Identitas')->disabled(),
+                \Filament\Forms\Components\TextInput::make('jenis_kelamin')->label('Jenis Kelamin')->disabled(),
+                \Filament\Forms\Components\TextInput::make('email')->label('Email')->disabled(),
+                \Filament\Forms\Components\TextInput::make('no_hp')->label('Nomor HP')->disabled(),
+                \Filament\Forms\Components\Textarea::make('alamat')->label('Alamat')->disabled()->columnSpanFull(),
+                \Filament\Forms\Components\TextInput::make('jurusan')->label('Jurusan')->disabled(),
+                \Filament\Forms\Components\TextInput::make('semester')->label('Semester')->disabled(),
+                \Filament\Forms\Components\TextInput::make('asal_instansi')->label('Asal Instansi')->disabled(),
+
+                \Filament\Forms\Components\ViewField::make('cv')
+                    ->label('CV')
+                    ->view('filament.components.view-file'),
+
+                \Filament\Forms\Components\ViewField::make('surat_pengantar')
+                    ->label('Surat Pengantar')
+                    ->view('filament.components.view-file'),
+
+                    \Filament\Forms\Components\TextInput::make('status')->label('Status')->disabled(),
+                ])
+                ->modalWidth('2xl'),
+
+            // 🔹 Cetak Laporan
+            Action::make('cetakLaporan')
+                ->label('Cetak Laporan')
+                ->icon('heroicon-o-printer')
+                ->color('success')
+                ->url(fn($record) => route('laporan.peserta.cetak', $record))
+                ->openUrlInNewTab(),
+
+            // 🔹 Edit Data
+            EditAction::make(),
             ])
+
+            // === AKSI MASSAL ===
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
 
-                    // 🔹 Bulk Action: Beri tugas ke banyak peserta
-                    BulkAction::make('beriTugas')
+                // 🔹 Bulk Action: Beri Tugas
+                BulkAction::make('beriTugas')
                         ->label('Beri Tugas')
                         ->icon('heroicon-o-clipboard-document')
                         ->color('success')
                         ->form([
                             TextInput::make('judul')
-                                ->label('Judul Tugas')
-                                ->placeholder('Contoh: Laporan Kegiatan Mingguan')
+                        ->label('Judul Tugas')
                                 ->required()
                                 ->columnSpanFull(),
 
@@ -169,15 +210,14 @@ class PesertaMagangsTable
                             }
 
                             Notification::make()
-                                ->title('Tugas Berhasil Diberikan')
-                                ->body('Tugas "' . $data['judul'] . '" diberikan ke ' . count($records) . ' peserta.')
-                                ->icon('heroicon-o-check-circle')
+                        ->title('Tugas Diberikan')
+                        ->body('Tugas "' . $data['judul'] . '" telah diberikan ke ' . count($records) . ' peserta.')
                                 ->success()
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('Beri Tugas Kepada Peserta Terpilih')
-                        ->modalButton('Kirim Tugas'),
+                    ->modalHeading('Beri Tugas Kepada Peserta')
+                    ->modalButton('Kirim'),
                 ]),
             ]);
     }
