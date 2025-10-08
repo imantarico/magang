@@ -36,8 +36,8 @@ class PesertaPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Peserta/Pages'), for: 'App\Filament\Peserta\Pages')
             ->pages([
             \App\Filament\Peserta\Pages\Dashboard::class,
-            \App\Filament\Peserta\Pages\RegisterPeserta::class,
-            ])
+            // \App\Filament\Peserta\Pages\RegisterPeserta::class,
+        ])
             ->discoverWidgets(in: app_path('Filament/Peserta/Widgets'), for: 'App\Filament\Peserta\Widgets')
             ->widgets([
             // AccountWidget::class,

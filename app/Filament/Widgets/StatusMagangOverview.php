@@ -15,8 +15,7 @@ class StatusMagangOverview extends BaseWidget
         if (! $peserta) {
             return [
                 Stat::make('Status Magang', 'Belum Terdaftar')
-                    ->description('Silakan daftar terlebih dahulu')
-                    ->icon('heroicon-o-user-exclamation'),
+                    ->description('Silakan daftar terlebih dahulu'),
             ];
         }
 

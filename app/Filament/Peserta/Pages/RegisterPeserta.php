@@ -118,12 +118,32 @@ class RegisterPeserta extends Page
         ]);
 
         // ✅ Simpan data peserta magang
-        PesertaMagang::create([
-            ...$validated,
-            'user_id' => $user->id,
-            'nama' => $validated['nama'],
-            'status' => 'daftar',
-        ]);
+        // PesertaMagang::create([
+        //     ...$validated,
+        //     'user_id' => $user->id,
+        //     'nama' => $validated['nama'],
+        //     'status' => 'daftar',
+        // ]);
+        //buat perintah simpan sederhana
+        $peserta = new PesertaMagang();
+        $peserta->user_id = $user->id;
+        $peserta->nama = $validated['nama'];
+        $peserta->no_identitas = $validated['no_identitas'] ?? null;
+        $peserta->jenis_kelamin = $validated['jenis_kelamin'];
+        $peserta->tanggal_lahir = $validated['tanggal_lahir'];
+        $peserta->no_hp = $validated['no_hp'] ?? null;
+        $peserta->email = $validated['email'];
+        $peserta->alamat = $validated['alamat'] ?? null;
+        $peserta->foto = $validated['foto'] ?? null;
+        $peserta->cv = $validated['cv'] ?? null;
+        $peserta->jurusan = $validated['jurusan'] ?? null;
+        $peserta->semester = $validated['semester'] ?? null;
+        $peserta->asal_instansi = $validated['asal_instansi'] ?? null;
+        $peserta->surat_pengantar = $validated['surat_pengantar'] ?? null;
+        $peserta->status = 'daftar';
+        $peserta->save();
+        // ✅ Notifikasi sukses
+
 
         Notification::make()
             ->title('Pendaftaran Berhasil!')
