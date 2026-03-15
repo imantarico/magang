@@ -5,7 +5,6 @@ use App\Http\Controllers\LaporanPesertaController;
 use App\Livewire\Peserta\RegisterPeserta;
 
 Route::get('/', function () {
-    //return to admin /admin/login
     return redirect('/admin/login');
 });
 Route::get('/laporan/peserta/{peserta}/cetak', [LaporanPesertaController::class, 'cetak'])
