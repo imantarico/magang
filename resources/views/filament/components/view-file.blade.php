@@ -6,8 +6,11 @@
 
     {{-- Konten file --}}
     @if ($getRecord()->{$getName()})
-        <a href="{{ asset('storage/' . $getRecord()->{$getName()}) }}"
-           target="_blank"/>
+        <a
+            href="{{ asset('storage/' . $getRecord()->{$getName()}) }}"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
             <span>Lihat File</span>
         </a>
     @else

@@ -73,7 +73,7 @@ class RegisterPeserta extends Component
         ]);
 
         // 🔔 Pesan sukses
-        session()->flash('success', 'Pendaftaran berhasil! Silakan tunggu verifikasi dari admin.');
+        session()->flash('success', 'Pendaftaran berhasil. Akun Anda baru bisa login setelah disetujui admin.');
 
         // 🔄 Reset form
         $this->reset();

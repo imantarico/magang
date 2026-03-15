@@ -5,11 +5,13 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Filament\Panel;
+use Filament\Models\Contracts\FilamentUser;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -23,6 +25,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -47,8 +50,28 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function pesertaMagang(): HasOne
+    {
+        return $this->hasOne(PesertaMagang::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
-        return str_ends_with($this->email, '@gmail.com');
+        if ($panel->getId() === 'admin') {
+            return $this->role === 'admin';
+        }
+
+        if ($panel->getId() === 'peserta') {
+            if ($this->role !== 'peserta') {
+                return false;
+            }
+
+            return $this->pesertaMagang()
+                ->whereIn('status', ['diterima', 'aktif', 'selesai'])
+                ->exists();
+        }
+
+        return false;
     }
 }
